@@ -1,0 +1,26 @@
+name: Trivy Image Scan
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+          sudo mv trivy /usr/local/bin/
+
+      - name: Build Docker Image
+        run: docker build -t myapp:latest .
+
+      - name: Scan Docker Image with Trivy
+        run: trivy image --exit-code 1 --severity CRITICAL,HIGH myapp:latest
+
